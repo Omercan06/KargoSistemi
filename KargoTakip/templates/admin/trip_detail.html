@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}Sefer Detayı #{{ trip.id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-route"></i> Sefer Detayı #{{ trip.id }}</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <h5><i class="fas fa-truck"></i> Araç Sayısı</h5>
+                <h2>{{ trip.vehicle_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <h5><i class="fas fa-box"></i> Kargo Sayısı</h5>
+                <h2>{{ trip.cargo_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <h5><i class="fas fa-road"></i> Toplam Mesafe</h5>
+                <h2>{{ "%.0f"|format(trip.total_distance) }} km</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body text-center">
+                <h5><i class="fas fa-dollar-sign"></i> Toplam Maliyet</h5>
+                <h2>{{ "%.0f"|format(trip.total_cost) }} ₺</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5><i class="fas fa-info-circle"></i> Sefer Bilgileri</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table">
+                            <tr>
+                                <th>Sefer No:</th>
+                                <td>#{{ trip.id }}</td>
+                            </tr>
+                            <tr>
+                                <th>Teslimat Tarihi:</th>
+                                <td>{{ trip.trip_date.strftime('%d.%m.%Y') }}</td>
+                            </tr>
+                            <tr>
+                                <th>Problem Tipi:</th>
+                                <td>
+                                    {% if trip.problem_type == 'unlimited' %}
+                                        <span class="badge bg-primary">Sınırsız Araç</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Belirli Sayıda Araç</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table">
+                            <tr>
+                                <th>Toplam Ağırlık:</th>
+                                <td>{{ "%.0f"|format(trip.total_weight) }} kg</td>
+                            </tr>
+                            <tr>
+                                <th>Kabul Edilen:</th>
+                                <td><span class="badge bg-success">{{ trip.accepted_cargo_count }} kargo</span></td>
+                            </tr>
+                            <tr>
+                                <th>Reddedilen:</th>
+                                <td><span class="badge bg-danger">{{ trip.rejected_cargo_count }} kargo</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-map"></i> Tüm Rotalar - Harita Görünümü</h5>
+            </div>
+            <div class="card-body">
+                {{ map_html|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h4><i class="fas fa-truck"></i> Araç Rotaları ve Detaylar</h4>
+    </div>
+</div>
+
+{% for route_detail in routes %}
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5>
+                    <i class="fas fa-truck"></i> {{ route_detail.route.vehicle.name }}
+                    <span class="badge bg-light text-dark float-end">Kapasite: {{ route_detail.route.vehicle.capacity }} kg</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-info-circle"></i> Rota Bilgileri:</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <th>Toplam Mesafe:</th>
+                                <td>{{ "%.2f"|format(route_detail.route.total_distance) }} km</td>
+                            </tr>
+                            <tr>
+                                <th>Maliyet:</th>
+                                <td>{{ "%.2f"|format(route_detail.route.total_cost) }} birim</td>
+                            </tr>
+                            <tr>
+                                <th>Toplam Ağırlık:</th>
+                                <td>{{ "%.2f"|format(route_detail.route.total_weight) }} kg</td>
+                            </tr>
+                            <tr>
+                                <th>Kargo Sayısı:</th>
+                                <td>{{ route_detail.route.cargo_count }} adet</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-route"></i> Güzergah:</h6>
+                        <div class="alert alert-light">
+                            <strong>Kocaeli Üniversitesi</strong>
+                            {% for station in route_detail.stations %}
+                                <br>↓<br>
+                                <i class="fas fa-warehouse"></i> <strong>{{ station }}</strong>
+                            {% endfor %}
+                            <br>↓<br>
+                            <strong>Kocaeli Üniversitesi</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <h6 class="mt-3"><i class="fas fa-users"></i> Kullanıcılar ve Kargoları:</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Kullanıcı</th>
+                                <th>Kargo No</th>
+                                <th>İstasyon</th>
+                                <th>Ağırlık</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cargo in route_detail.cargos %}
+                            <tr>
+                                <td><i class="fas fa-user"></i> {{ cargo.user.username }}</td>
+                                <td>#{{ cargo.id }}</td>
+                                <td><i class="fas fa-warehouse"></i> {{ cargo.station.name }}</td>
+                                <td>{{ cargo.weight }} kg</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<div class="row mt-3">
+    <div class="col-12">
+        <a href="{{ url_for('list_trips') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Seferler Listesine Dön
+        </a>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary">
+            <i class="fas fa-home"></i> Ana Panele Dön
+        </a>
+    </div>
+</div>
+{% endblock %}
+

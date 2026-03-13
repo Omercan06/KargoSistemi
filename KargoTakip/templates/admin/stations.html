@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}İstasyon Yönetimi{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-warehouse"></i> İstasyon Yönetimi</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-plus"></i> Yeni İstasyon Ekle</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">İstasyon Adı <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="latitude" class="form-label">Latitude (Enlem) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="latitude" name="latitude" 
+                               step="0.0001" required>
+                        <small class="text-muted">Örn: 40.7654</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="longitude" class="form-label">Longitude (Boylam) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="longitude" name="longitude" 
+                               step="0.0001" required>
+                        <small class="text-muted">Örn: 29.9400</small>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Koordinatları Google Maps'ten alabilirsiniz.
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-save"></i> Kaydet
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-list"></i> Mevcut İstasyonlar ({{ stations|length }})</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>İstasyon Adı</th>
+                                <th>Latitude</th>
+                                <th>Longitude</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for station in stations %}
+                            <tr>
+                                <td>{{ station.id }}</td>
+                                <td><i class="fas fa-warehouse"></i> {{ station.name }}</td>
+                                <td>{{ "%.4f"|format(station.latitude) }}</td>
+                                <td>{{ "%.4f"|format(station.longitude) }}</td>
+                                <td>
+                                    {% if station.is_active %}
+                                        <span class="badge bg-success">Aktif</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Pasif</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-map"></i> İstasyonlar Haritası</h5>
+            </div>
+            <div class="card-body">
+                {{ map_html|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

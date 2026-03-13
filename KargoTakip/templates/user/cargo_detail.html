@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Kargo Detayı{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-box"></i> Kargo Detayı #{{ cargo.id }}</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-info-circle"></i> Kargo Bilgileri</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tr>
+                        <th>Kargo No:</th>
+                        <td>{{ cargo.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>İstasyon:</th>
+                        <td><i class="fas fa-warehouse"></i> {{ cargo.station.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Ağırlık:</th>
+                        <td>{{ cargo.weight }} kg</td>
+                    </tr>
+                    <tr>
+                        <th>Teslimat Tarihi:</th>
+                        <td>{{ cargo.delivery_date.strftime('%d.%m.%Y') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Durum:</th>
+                        <td>
+                            {% if cargo.status == 'pending' %}
+                                <span class="badge bg-warning">Bekliyor</span>
+                            {% elif cargo.status == 'assigned' %}
+                                <span class="badge bg-success">Atandı</span>
+                            {% elif cargo.status == 'delivered' %}
+                                <span class="badge bg-info">Teslim Edildi</span>
+                            {% elif cargo.status == 'rejected' %}
+                                <span class="badge bg-danger">Reddedildi</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Oluşturma:</th>
+                        <td>{{ cargo.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    {% if route %}
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-truck"></i> Rota Bilgileri</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tr>
+                        <th>Araç:</th>
+                        <td>{{ route.vehicle.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Kapasite:</th>
+                        <td>{{ route.vehicle.capacity }} kg</td>
+                    </tr>
+                    <tr>
+                        <th>Toplam Mesafe:</th>
+                        <td>{{ "%.2f"|format(route.distance) }} km</td>
+                    </tr>
+                    <tr>
+                        <th>Maliyet:</th>
+                        <td>{{ "%.2f"|format(route.cost) }} birim</td>
+                    </tr>
+                    <tr>
+                        <th>Güzergah:</th>
+                        <td>
+                            Üniversite →
+                            {% for station in route.stations %}
+                                {{ station }}{% if not loop.last %} → {% endif %}
+                            {% endfor %}
+                            → Üniversite
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-md-6">
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i> Bu kargo için henüz rota planlanmamış.
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if map_html %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-map"></i> Güzergah Haritası</h5>
+            </div>
+            <div class="card-body">
+                {{ map_html|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mt-3">
+    <div class="col-12">
+        <a href="{{ url_for('user_dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Geri Dön
+        </a>
+    </div>
+</div>
+{% endblock %}
+

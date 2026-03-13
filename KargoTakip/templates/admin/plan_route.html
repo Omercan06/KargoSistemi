@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Rota Planlama{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-route"></i> Rota Planlama</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4><i class="fas fa-cog"></i> Rota Planlama Ayarları</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-4">
+                        <label class="form-label"><strong>Problem Tipi:</strong> <span class="text-danger">*</span></label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="problem_type" 
+                                                   id="unlimited" value="unlimited" checked>
+                                            <label class="form-check-label" for="unlimited">
+                                                <h5><i class="fas fa-infinity"></i> Sınırsız Araç</h5>
+                                            </label>
+                                        </div>
+                                        <p class="small text-muted mt-2">
+                                            Minimum maliyetle gerektiği kadar araç kullanılır. 
+                                            Araç yetersizse kiralama yapılır.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-warning">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="problem_type" 
+                                                   id="limited" value="limited">
+                                            <label class="form-check-label" for="limited">
+                                                <h5><i class="fas fa-truck"></i> Belirli Sayıda Araç</h5>
+                                            </label>
+                                        </div>
+                                        <p class="small text-muted mt-2">
+                                            Mevcut araçlarla maksimum kargo taşınır. 
+                                            Bazı kargolar reddedilebilir.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3" id="optimization_target_div" style="display: none;">
+                        <label class="form-label"><strong>Optimizasyon Hedefi:</strong></label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="optimization_target" 
+                                           id="opt_weight" value="weight" checked>
+                                    <label class="form-check-label" for="opt_weight">
+                                        <i class="fas fa-weight"></i> Maksimum Ağırlık
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="optimization_target" 
+                                           id="opt_count" value="count">
+                                    <label class="form-check-label" for="opt_count">
+                                        <i class="fas fa-boxes"></i> Maksimum Sayı
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            Maksimum ağırlık: En fazla toplam kg taşınsın<br>
+                            Maksimum sayı: En fazla kargo adedi taşınsın
+                        </small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="delivery_date" class="form-label">
+                            <strong>Teslimat Tarihi:</strong> <span class="text-danger">*</span>
+                        </label>
+                        <input type="date" class="form-control" id="delivery_date" name="delivery_date" 
+                               value="{{ default_date }}" required>
+                        <small class="text-muted">
+                            Bu tarih için bekleyen kargolar planlamaya dahil edilecektir.
+                        </small>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle"></i> Bilgilendirme:</h6>
+                        <ul class="mb-0">
+                            <li>Seçilen tarih için bekleyen kargolar listelenecek</li>
+                            <li>Gerçek yol ağı kullanılarak optimal rotalar oluşturulacak</li>
+                            <li>Tüm maliyet ve mesafe hesaplamaları otomatik yapılacak</li>
+                            <li>Sezgisel optimizasyon algoritmaları uygulanacak</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-play"></i> Rota Planlamasını Başlat
+                        </button>
+                        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> İptal
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Belirli sayıda araç seçildiğinde optimizasyon hedefi göster
+    document.querySelectorAll('input[name="problem_type"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            var targetDiv = document.getElementById('optimization_target_div');
+            if (this.value === 'limited') {
+                targetDiv.style.display = 'block';
+            } else {
+                targetDiv.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}
+

@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Yönetici Paneli{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-tachometer-alt"></i> Yönetici Paneli</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-warehouse"></i> İstasyonlar</h5>
+                <h2>{{ stats.stations }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-truck"></i> Araçlar</h5>
+                <h2>{{ stats.vehicles }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-box"></i> Bekleyen Kargo</h5>
+                <h2>{{ stats.pending_cargos }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-route"></i> Toplam Sefer</h5>
+                <h2>{{ stats.trips }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-dark">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-flask"></i> Dokümantasyon Test Senaryoları</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Aşağıdaki butonları kullanarak dokümantasyonda belirtilen test verilerini sisteme
+                    yükleyebilirsiniz. <strong>Not:</strong> Bu işlem bekleyen tüm kargoları siler.</p>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="d-grid">
+                            <a href="{{ url_for('load_scenario', scenario_id=1) }}" class="btn btn-outline-primary"
+                                onclick="return confirm('Mevcut bekleyen kargolar silinecek. Onaylıyor musunuz?')">
+                                <strong>Senaryo 1</strong><br>
+                                <small>Kapasite Yeterli</small>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-grid">
+                            <a href="{{ url_for('load_scenario', scenario_id=2) }}" class="btn btn-outline-primary"
+                                onclick="return confirm('Mevcut bekleyen kargolar silinecek. Onaylıyor musunuz?')">
+                                <strong>Senaryo 2</strong><br>
+                                <small>Yüksek Yoğunluk</small>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-grid">
+                            <a href="{{ url_for('load_scenario', scenario_id=3) }}" class="btn btn-outline-danger"
+                                onclick="return confirm('Mevcut bekleyen kargolar silinecek. Onaylıyor musunuz?')">
+                                <strong>Senaryo 3</strong><br>
+                                <small>Kiralama Gerekli</small>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-grid">
+                            <a href="{{ url_for('load_scenario', scenario_id=4) }}" class="btn btn-outline-primary"
+                                onclick="return confirm('Mevcut bekleyen kargolar silinecek. Onaylıyor musunuz?')">
+                                <strong>Senaryo 4</strong><br>
+                                <small>Dağınık Rota</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-tasks"></i> Hızlı İşlemler</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('plan_route') }}" class="btn btn-lg btn-success">
+                        <i class="fas fa-route"></i> Yeni Rota Planla
+                    </a>
+                    <a href="{{ url_for('bulk_cargo') }}" class="btn btn-lg btn-warning">
+                        <i class="fas fa-boxes"></i> Toplu Kargo Ekle
+                    </a>
+                    <a href="{{ url_for('manage_stations') }}" class="btn btn-lg btn-primary">
+                        <i class="fas fa-warehouse"></i> İstasyon Ekle/Yönet
+                    </a>
+                    <a href="{{ url_for('scenario_reports') }}" class="btn btn-lg btn-dark">
+                        <i class="fas fa-chart-bar"></i> Senaryo Raporları
+                    </a>
+                    <a href="{{ url_for('list_trips') }}" class="btn btn-lg btn-info">
+                        <i class="fas fa-list"></i> Tüm Seferleri Görüntüle
+                    </a>
+                    <a href="{{ url_for('manage_parameters') }}" class="btn btn-lg btn-warning">
+                        <i class="fas fa-cog"></i> Parametreleri Düzenle
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-history"></i> Son Seferler</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_trips %}
+                <div class="list-group">
+                    {% for trip in recent_trips %}
+                    <a href="{{ url_for('view_trip', trip_id=trip.id) }}"
+                        class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Sefer #{{ trip.id }}</h6>
+                            <small>{{ trip.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+                        </div>
+                        <p class="mb-1">
+                            <span class="badge bg-primary">{{ trip.vehicle_count }} Araç</span>
+                            <span class="badge bg-success">{{ trip.cargo_count }} Kargo</span>
+                            <span class="badge bg-info">{{ "%.0f"|format(trip.total_distance) }} km</span>
+                            <span class="badge bg-warning">{{ "%.0f"|format(trip.total_cost) }} birim</span>
+                        </p>
+                        <small>
+                            {% if trip.problem_type == 'unlimited' %}
+                            <span class="badge bg-secondary">Sınırsız Araç</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Belirli Sayıda Araç</span>
+                            {% endif %}
+                        </small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Henüz sefer oluşturulmamış.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-light">
+            <h5><i class="fas fa-info-circle"></i> Sistem Özellikleri</h5>
+            <ul>
+                <li><strong>Gerçek Yol Ağı:</strong> Kuş uçuşu mesafe kullanılmaz, gerçek yol algoritması uygulanır</li>
+                <li><strong>İki Problem Tipi:</strong> Sınırsız araç ve belirli sayıda araç problemleri desteklenir</li>
+                <li><strong>Optimizasyon:</strong> Genetik algoritma ve sezgisel yöntemlerle optimal rotalar oluşturulur
+                </li>
+                <li><strong>Dinamik Parametreler:</strong> Tüm maliyet ve kapasite parametreleri değiştirilebilir</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

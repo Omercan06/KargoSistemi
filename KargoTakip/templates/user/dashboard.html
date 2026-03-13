@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Kullanıcı Paneli{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-home"></i> Hoşgeldiniz, {{ current_user.username }}</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-box"></i> Toplam Kargo</h5>
+                <h2>{{ cargos|length }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-clock"></i> Bekleyen</h5>
+                <h2>{{ cargos|selectattr('status', 'equalto', 'pending')|list|length }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-check"></i> Atanan</h5>
+                <h2>{{ cargos|selectattr('status', 'equalto', 'assigned')|list|length }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-list"></i> Kargolarım</h5>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('send_cargo') }}" class="btn btn-primary mb-3">
+                    <i class="fas fa-plus"></i> Yeni Kargo Gönder
+                </a>
+                
+                {% if cargos %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>İstasyon</th>
+                                    <th>Ağırlık (kg)</th>
+                                    <th>Teslimat Tarihi</th>
+                                    <th>Durum</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cargo in cargos %}
+                                <tr>
+                                    <td>{{ cargo.id }}</td>
+                                    <td><i class="fas fa-warehouse"></i> {{ cargo.station.name }}</td>
+                                    <td>{{ cargo.weight }} kg</td>
+                                    <td>{{ cargo.delivery_date.strftime('%d.%m.%Y') }}</td>
+                                    <td>
+                                        {% if cargo.status == 'pending' %}
+                                            <span class="badge bg-warning">Bekliyor</span>
+                                        {% elif cargo.status == 'assigned' %}
+                                            <span class="badge bg-success">Atandı</span>
+                                        {% elif cargo.status == 'delivered' %}
+                                            <span class="badge bg-info">Teslim Edildi</span>
+                                        {% elif cargo.status == 'rejected' %}
+                                            <span class="badge bg-danger">Reddedildi</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('view_cargo', cargo_id=cargo.id) }}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i> Detay
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Henüz kargo kaydınız bulunmuyor.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

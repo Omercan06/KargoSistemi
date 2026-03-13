@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Toplu Kargo Ekleme{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-boxes"></i> Toplu Kargo Ekleme</h2>
+        <p class="text-muted">Dokümantasyona göre: İstasyon bazında kargo sayısı ve toplam ağırlık bilgisi ile toplu kargo oluşturma</p>
+        <hr>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h4><i class="fas fa-plus-circle"></i> Senaryo Verileri ile Toplu Kargo Oluştur</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="user_id" class="form-label">Kullanıcı Seç <span class="text-danger">*</span></label>
+                        <select class="form-select" id="user_id" name="user_id" required>
+                            <option value="">-- Kullanıcı Seçiniz --</option>
+                            {% for user in users %}
+                                <option value="{{ user.id }}">{{ user.username }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-text text-muted">Kargoları hangi kullanıcı adına oluşturulacak?</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="station_id" class="form-label">İstasyon Seç <span class="text-danger">*</span></label>
+                        <select class="form-select" id="station_id" name="station_id" required>
+                            <option value="">-- İstasyon Seçiniz --</option>
+                            {% for station in stations %}
+                                <option value="{{ station.id }}">{{ station.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-text text-muted">Kargonun gönderileceği ilçeyi seçiniz.</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cargo_count" class="form-label">Kargo Sayısı <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="cargo_count" name="cargo_count" 
+                               min="1" step="1" required>
+                        <small class="form-text text-muted">Örn: Senaryo 2'de Başiskele için 40 kargo</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="total_weight" class="form-label">Toplam Ağırlık (kg) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="total_weight" name="total_weight" 
+                               min="0.1" step="0.1" required>
+                        <small class="form-text text-muted">Örn: Senaryo 2'de Başiskele için 200 kg</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="delivery_date" class="form-label">Teslimat Tarihi <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="delivery_date" name="delivery_date" required>
+                        <small class="form-text text-muted">Kargoların teslim edilmesini istediğiniz tarihi seçiniz.</small>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle"></i> Nasıl Çalışır?</h6>
+                        <ul class="mb-0">
+                            <li><strong>Kargo Sayısı:</strong> Kaç adet kargo oluşturulacak (örn: 40)</li>
+                            <li><strong>Toplam Ağırlık:</strong> Tüm kargoların toplam ağırlığı (örn: 200 kg)</li>
+                            <li><strong>Otomatik Hesaplama:</strong> Sistem ağırlığı eşit olarak dağıtır (200 kg ÷ 40 = 5 kg/kargo)</li>
+                            <li><strong>Dokümantasyon Uyumu:</strong> Senaryo tablolarındaki "Kargo Sayısı" ve "Ağırlık (kg)" bilgilerini kullanır</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-exclamation-triangle"></i> Senaryo Örnekleri:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Senaryo 2 - Başiskele:</strong><br>
+                                Kargo Sayısı: 40<br>
+                                Toplam Ağırlık: 200 kg
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Senaryo 2 - Çayırova:</strong><br>
+                                Kargo Sayısı: 35<br>
+                                Toplam Ağırlık: 175 kg
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            <i class="fas fa-magic"></i> Toplu Kargo Oluştur
+                        </button>
+                        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Ana Panele Dön
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-table"></i> Senaryo 2 Hızlı Referans</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th>İlçe</th>
+                                <th>Kargo Sayısı</th>
+                                <th>Toplam Ağırlık (kg)</th>
+                                <th>Kargo Başına (kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Başiskele</td>
+                                <td>40</td>
+                                <td>200</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <td>Çayırova</td>
+                                <td>35</td>
+                                <td>175</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <td>Darıca</td>
+                                <td>10</td>
+                                <td>150</td>
+                                <td>15</td>
+                            </tr>
+                            <tr>
+                                <td>Derince</td>
+                                <td>5</td>
+                                <td>100</td>
+                                <td>20</td>
+                            </tr>
+                            <tr>
+                                <td>Gebze</td>
+                                <td>8</td>
+                                <td>120</td>
+                                <td>15</td>
+                            </tr>
+                            <tr>
+                                <td>İzmit</td>
+                                <td>20</td>
+                                <td>160</td>
+                                <td>8</td>
+                            </tr>
+                            <tr class="table-info">
+                                <td><strong>TOPLAM</strong></td>
+                                <td><strong>118</strong></td>
+                                <td><strong>905</strong></td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <small class="text-muted">Bu tabloyu kullanarak Senaryo 2'yi hızlıca oluşturabilirsiniz.</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Minimum tarih bugün olsun
+    document.addEventListener('DOMContentLoaded', function() {
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('delivery_date').setAttribute('min', today);
+        
+        // Kargo sayısı ve toplam ağırlık değiştiğinde kargo başına ağırlığı göster
+        var cargoCountInput = document.getElementById('cargo_count');
+        var totalWeightInput = document.getElementById('total_weight');
+        
+        function calculateWeightPerCargo() {
+            var count = parseInt(cargoCountInput.value) || 0;
+            var total = parseFloat(totalWeightInput.value) || 0;
+            
+            if (count > 0 && total > 0) {
+                var perCargo = (total / count).toFixed(2);
+                // Bilgi mesajı göster
+                var infoText = document.querySelector('#total_weight + small');
+                if (infoText) {
+                    infoText.textContent = 'Her kargo yaklaşık ' + perCargo + ' kg olacak.';
+                }
+            }
+        }
+        
+        cargoCountInput.addEventListener('input', calculateWeightPerCargo);
+        totalWeightInput.addEventListener('input', calculateWeightPerCargo);
+    });
+</script>
+{% endblock %}
+
+

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Tüm Seferler{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-list"></i> Tüm Seferler</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-history"></i> Sefer Geçmişi ({{ trips|length }} adet)</h5>
+            </div>
+            <div class="card-body">
+                {% if trips %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Tarih</th>
+                                    <th>Problem Tipi</th>
+                                    <th>Araç</th>
+                                    <th>Kargo</th>
+                                    <th>Mesafe</th>
+                                    <th>Maliyet</th>
+                                    <th>Kabul/Red</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for trip in trips %}
+                                <tr>
+                                    <td><strong>#{{ trip.id }}</strong></td>
+                                    <td>{{ trip.trip_date.strftime('%d.%m.%Y') }}</td>
+                                    <td>
+                                        {% if trip.problem_type == 'unlimited' %}
+                                            <span class="badge bg-primary">Sınırsız</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Belirli</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-truck"></i> {{ trip.vehicle_count }}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-box"></i> {{ trip.cargo_count }}
+                                        <br><small>{{ "%.0f"|format(trip.total_weight) }} kg</small>
+                                    </td>
+                                    <td>{{ "%.0f"|format(trip.total_distance) }} km</td>
+                                    <td><strong>{{ "%.0f"|format(trip.total_cost) }}</strong> birim</td>
+                                    <td>
+                                        <span class="badge bg-success">{{ trip.accepted_cargo_count }}</span> /
+                                        <span class="badge bg-danger">{{ trip.rejected_cargo_count }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('view_trip', trip_id=trip.id) }}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i> Detay
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Henüz sefer kaydı bulunmuyor.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

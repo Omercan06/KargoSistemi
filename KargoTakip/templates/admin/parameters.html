@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Parametre Yönetimi{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-cog"></i> Sistem Parametreleri</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h5><i class="fas fa-sliders-h"></i> Parametreleri Düzenle</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> <strong>Not:</strong> Bu parametreler değiştirilerek farklı senaryolar test edilebilir.
+                </div>
+                
+                <form method="POST">
+                    {% for param in parameters %}
+                    <div class="mb-4">
+                        <label for="param_{{ param.id }}" class="form-label">
+                            <strong>{{ param.description }}</strong>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                {% if 'maliyet' in param.description.lower() or 'cost' in param.key.lower() %}
+                                    <i class="fas fa-dollar-sign"></i>
+                                {% elif 'kapasite' in param.description.lower() or 'capacity' in param.key.lower() %}
+                                    <i class="fas fa-weight"></i>
+                                {% else %}
+                                    <i class="fas fa-cog"></i>
+                                {% endif %}
+                            </span>
+                            <input type="number" class="form-control" id="param_{{ param.id }}" 
+                                   name="param_{{ param.id }}" value="{{ param.value }}" step="0.01" required>
+                        </div>
+                        <small class="text-muted">
+                            Parametre: <code>{{ param.key }}</code> | 
+                            Son güncelleme: {{ param.updated_at.strftime('%d.%m.%Y %H:%M') }}
+                        </small>
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-exclamation-triangle"></i> Uyarı:</h6>
+                        <p class="mb-0">
+                            Parametre değişiklikleri yeni oluşturulacak rota planlamalarını etkiler. 
+                            Daha önce oluşturulmuş planlamalar değişmez.
+                        </p>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-save"></i> Değişiklikleri Kaydet
+                        </button>
+                        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> İptal
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-book"></i> Parametre Açıklamaları</h5>
+            </div>
+            <div class="card-body">
+                <h6>Maliyet Parametreleri:</h6>
+                <ul>
+                    <li><strong>COST_PER_KM:</strong> Her kilometre için yakıt maliyeti (birim/km)</li>
+                    <li><strong>RENTAL_COST:</strong> Yeni araç kiralama ücreti (birim)</li>
+                </ul>
+                
+                <h6>Kapasite Parametreleri:</h6>
+                <ul>
+                    <li><strong>RENTAL_CAPACITY:</strong> Kiralanacak aracın yük kapasitesi (kg)</li>
+                </ul>
+                
+                <h6>Sabit Bilgiler:</h6>
+                <ul>
+                    <li><strong>Başlangıç Araçları:</strong> 3 adet (500 kg, 750 kg, 1000 kg)</li>
+                    <li><strong>Kiralama:</strong> Sadece "Sınırsız Araç" probleminde</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
